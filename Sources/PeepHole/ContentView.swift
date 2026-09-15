@@ -33,7 +33,7 @@ struct ContentView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
-                Text("NetHog").font(.system(size: 13, weight: .bold))
+                Text("PeepHole").font(.system(size: 13, weight: .bold))
                 Spacer()
                 Text("All apps, excluding localhost")
                     .font(.system(size: 10))
@@ -319,7 +319,7 @@ struct FooterView: View {
                     ForEach(Activity.choices, id: \.self) { Text(Format.rate($0, bits: useBits)).tag($0) }
                 }
                 if AppLocation.isTemporary {
-                    Text("Move NetHog to Applications to launch at login")
+                    Text("Move PeepHole to Applications to launch at login")
                 } else {
                     Toggle("Launch at login", isOn: $launchAtLogin)
                         .onChange(of: launchAtLogin) { enabled in
@@ -348,7 +348,7 @@ struct FooterView: View {
                 .foregroundStyle(.tertiary)
             Spacer()
 
-            Button("Quit NetHog") { NSApp.terminate(nil) }
+            Button("Quit PeepHole") { NSApp.terminate(nil) }
                 .buttonStyle(.borderless)
                 .font(.system(size: 11))
         }

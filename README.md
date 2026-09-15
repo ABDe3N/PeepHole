@@ -1,32 +1,32 @@
-# NetHog
+# PeepHole
 
 A tiny macOS menu bar app that shows which apps are using your network right now,
 with live download and upload speeds for each one.
 
 ## Install
 
-Download the latest `NetHog-<version>.dmg` from
-[Releases](https://github.com/ABDe3N/NetHog/releases), open it, and drag NetHog into
+Download the latest `PeepHole-<version>.dmg` from
+[Releases](https://github.com/ABDe3N/PeepHole/releases), open it, and drag PeepHole into
 Applications. Open it from Applications, not from the disk image, or Launch at login
-and updates won't work (NetHog will remind you).
+and updates won't work (PeepHole will remind you).
 
-NetHog checks for updates with [Sparkle](https://sparkle-project.org). You can also
+PeepHole checks for updates with [Sparkle](https://sparkle-project.org). You can also
 check by hand from the gear menu.
 
 ## Privacy
 
-NetHog never sends anything anywhere. It has no analytics, no account, and needs no
+PeepHole never sends anything anywhere. It has no analytics, no account, and needs no
 admin password or special permissions. The only network request it makes is the update
 check against this repository's releases.
 
 ## Build and run
 
 ```bash
-./build.sh            # builds build/NetHog.app
+./build.sh            # builds build/PeepHole.app
 ./build.sh install    # also copies it to /Applications and launches it
 ```
 
-To make a universal `build/NetHog-<version>.dmg`, run `./release.sh`. Set
+To make a universal `build/PeepHole-<version>.dmg`, run `./release.sh`. Set
 `SIGN_IDENTITY` and `NOTARY_PROFILE` to sign and notarize it for public download
 (see the top of `release.sh`).
 
@@ -37,7 +37,7 @@ Requires macOS 13+ and the Xcode command line tools. Regenerate the icon with
 
 ## How it works
 
-Every second NetHog runs the built-in `/usr/bin/nettop` (no root needed), reads each
+Every second PeepHole runs the built-in `/usr/bin/nettop` (no root needed), reads each
 process's cumulative bytes in/out, and turns the differences into per-second rates.
 Loopback (localhost) traffic is excluded.
 
@@ -48,10 +48,10 @@ Turn off "Group" to see individual processes.
 The XPC attribution uses `responsibility_get_pid_responsible_for_pid`, a private macOS
 function that Activity Monitor also relies on. It is looked up at runtime, so if a future
 macOS removes it, those services just show under their own names. (Private API use is
-also why NetHog can't be on the Mac App Store.)
+also why PeepHole can't be on the Mac App Store.)
 
 - **Live**: what's transferring now (idle apps fade out after 5 seconds).
-- **Since Launch**: total data per app since NetHog started.
+- **Since Launch**: total data per app since PeepHole started.
 - Apps only get a row once they stay above 50 KB/s for 2 seconds (or burst past
   10× that). Adjustable to 20/50/100 KB/s under the gear menu. Header and menu bar
   totals still count everything.
@@ -64,8 +64,8 @@ also why NetHog can't be on the Mac App Store.)
 ## Debug flags
 
 ```bash
-build/NetHog.app/Contents/MacOS/NetHog --dump [--no-group]   # print current hogs to the terminal
-build/NetHog.app/Contents/MacOS/NetHog --snapshot ui.png     # render the popover to an image
+build/PeepHole.app/Contents/MacOS/PeepHole --dump [--no-group]   # print current network users to the terminal
+build/PeepHole.app/Contents/MacOS/PeepHole --snapshot ui.png     # render the popover to an image
 ```
 
 ## License

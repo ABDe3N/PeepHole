@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// `NetHog --snapshot <file.png>`: render the popover to an image after a few
+/// `PeepHole --snapshot <file.png>`: render the popover to an image after a few
 /// seconds of live sampling. Handy for checking the UI without clicking around.
 enum Snapshot {
     @MainActor static func run(to path: String) {

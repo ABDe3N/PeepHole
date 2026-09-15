@@ -1,5 +1,5 @@
 import XCTest
-@testable import NetHog
+@testable import PeepHole
 
 final class NettopParseTests: XCTestCase {
     func testParsesProcessLines() {
@@ -59,11 +59,11 @@ final class ProcessResolverTests: XCTestCase {
     }
 
     func testTemporaryLocations() {
-        XCTAssertTrue(AppLocation.isTemporary(path: "/Volumes/NetHog 1.0/NetHog.app"))
+        XCTAssertTrue(AppLocation.isTemporary(path: "/Volumes/PeepHole 1.0/PeepHole.app"))
         XCTAssertTrue(AppLocation.isTemporary(
-            path: "/private/var/folders/x/AppTranslocation/1234/d/NetHog.app"))
-        XCTAssertFalse(AppLocation.isTemporary(path: "/Applications/NetHog.app"))
-        XCTAssertFalse(AppLocation.isTemporary(path: "/Users/me/Applications/NetHog.app"))
+            path: "/private/var/folders/x/AppTranslocation/1234/d/PeepHole.app"))
+        XCTAssertFalse(AppLocation.isTemporary(path: "/Applications/PeepHole.app"))
+        XCTAssertFalse(AppLocation.isTemporary(path: "/Users/me/Applications/PeepHole.app"))
     }
 }
 

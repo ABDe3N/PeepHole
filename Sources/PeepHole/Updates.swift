@@ -26,7 +26,7 @@ final class Updates: ObservableObject {
     }
 
     func checkForUpdates() {
-        // NetHog has no Dock icon, so bring it forward or the update window opens behind other apps.
+        // PeepHole has no Dock icon, so bring it forward or the update window opens behind other apps.
         NSApp.activate(ignoringOtherApps: true)
         controller.checkForUpdates(nil)
     }

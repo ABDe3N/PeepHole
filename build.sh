@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds NetHog.app into ./build. Pass "install" to also copy it to /Applications.
+# Builds PeepHole.app into ./build. Pass "install" to also copy it to /Applications.
 #   UNIVERSAL=1      build for both Apple silicon and Intel
 #   SIGN_IDENTITY=…  sign with a Developer ID (hardened runtime) instead of ad-hoc
 set -euo pipefail
@@ -14,10 +14,10 @@ fi
 swift build "${SWIFT_FLAGS[@]}"
 BIN_DIR="$(swift build "${SWIFT_FLAGS[@]}" --show-bin-path)"
 
-APP="build/NetHog.app"
+APP="build/PeepHole.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
-cp "$BIN_DIR/NetHog" "$APP/Contents/MacOS/NetHog"
+cp "$BIN_DIR/PeepHole" "$APP/Contents/MacOS/PeepHole"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 if [ -f Resources/AppIcon.icns ]; then
     cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
@@ -41,12 +41,12 @@ else
     sign "$APP"
 fi
 codesign --verify --deep --strict "$APP"
-echo "Built $APP ($(lipo -archs "$APP/Contents/MacOS/NetHog"))"
+echo "Built $APP ($(lipo -archs "$APP/Contents/MacOS/PeepHole"))"
 
 if [ "${1:-}" = "install" ]; then
-    osascript -e 'quit app "NetHog"' 2>/dev/null || true
-    rm -rf /Applications/NetHog.app
+    osascript -e 'quit app "PeepHole"' 2>/dev/null || true
+    rm -rf /Applications/PeepHole.app
     cp -R "$APP" /Applications/
-    echo "Installed to /Applications/NetHog.app"
-    open /Applications/NetHog.app
+    echo "Installed to /Applications/PeepHole.app"
+    open /Applications/PeepHole.app
 fi

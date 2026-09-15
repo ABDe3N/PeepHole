@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>NetHog</string>
+	<string>PeepHole</string>
 	<key>CFBundleExecutable</key>
-	<string>NetHog</string>
+	<string>PeepHole</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.ibnabdeen.NetHog</string>
+	<string>com.ibnabdeen.PeepHole</string>
 	<key>CFBundleName</key>
-	<string>NetHog</string>
+	<string>PeepHole</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -29,7 +29,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2026 Amr Abdeen</string>
 	<key>SUFeedURL</key>
-	<string>https://github.com/ABDe3N/NetHog/releases/latest/download/appcast.xml</string>
+	<string>https://github.com/ABDe3N/PeepHole/releases/latest/download/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>cjZHJE4i7NaC6irOMGH3NImP02cN6xNZXykoNREP0YI=</string>
 </dict>

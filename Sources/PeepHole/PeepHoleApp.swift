@@ -10,11 +10,11 @@ enum Entry {
         } else if let index = args.firstIndex(of: "--snapshot"), index + 1 < args.count {
             MainActor.assumeIsolated { Snapshot.run(to: args[index + 1]) }
         } else {
-            NetHogApp.main()
+            PeepHoleApp.main()
         }
     }
 
-    /// `NetHog --dump`: print the top network users once, for terminal use.
+    /// `PeepHole --dump`: print the top network users once, for terminal use.
     @MainActor static func dumpToTerminal() {
         let monitor = NetworkMonitor()
         RunLoop.main.run(until: Date().addingTimeInterval(3.2))
@@ -31,7 +31,7 @@ enum Entry {
     }
 }
 
-struct NetHogApp: App {
+struct PeepHoleApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {

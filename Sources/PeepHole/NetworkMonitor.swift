@@ -14,7 +14,7 @@ struct UsageRow: Identifiable {
     let downRate: Double      // bytes per second
     let upRate: Double
     let averageRate: Double   // smoothed over a few seconds, used for sorting
-    let totalDown: UInt64     // bytes since NetHog started
+    let totalDown: UInt64     // bytes since PeepHole started
     let totalUp: UInt64
     let lastActive: Date
     let children: [UsageRow]
@@ -55,7 +55,7 @@ final class NetworkMonitor: ObservableObject {
     @Published private(set) var history: [ThroughputPoint] = []
     @Published private(set) var entries: [Int32: ProcessEntry] = [:]
     /// Exited processes, merged per executable so memory and per-tick work stay
-    /// bounded no matter how long NetHog runs. Only shown in Since Launch.
+    /// bounded no matter how long PeepHole runs. Only shown in Since Launch.
     private var retired: [String: ProcessEntry] = [:]
     /// Fires after every sample, once all published values are updated.
     let didUpdate = PassthroughSubject<Void, Never>()
