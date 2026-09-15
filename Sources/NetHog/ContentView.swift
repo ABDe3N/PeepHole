@@ -305,6 +305,7 @@ struct FooterView: View {
     @AppStorage(Activity.thresholdKey) private var threshold = Activity.defaultThreshold
     @AppStorage(Activity.floorKey) private var floor = Activity.defaultFloor
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
+    @ObservedObject private var updates = Updates.shared
 
     var body: some View {
         HStack {
@@ -317,14 +318,23 @@ struct FooterView: View {
                 Picker("Turn arrows green above", selection: $threshold) {
                     ForEach(Activity.choices, id: \.self) { Text(Format.rate($0, bits: useBits)).tag($0) }
                 }
-                Toggle("Launch at login", isOn: $launchAtLogin)
-                    .onChange(of: launchAtLogin) { enabled in
-                        do {
-                            if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
-                        } catch {
-                            launchAtLogin = SMAppService.mainApp.status == .enabled
+                if AppLocation.isTemporary {
+                    Text("Move NetHog to Applications to launch at login")
+                } else {
+                    Toggle("Launch at login", isOn: $launchAtLogin)
+                        .onChange(of: launchAtLogin) { enabled in
+                            do {
+                                if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+                            } catch {
+                                launchAtLogin = SMAppService.mainApp.status == .enabled
+                            }
                         }
-                    }
+                }
+                if updates.isAvailable {
+                    Divider()
+                    Button("Check for Updates…") { updates.checkForUpdates() }
+                        .disabled(!updates.canCheck)
+                }
             } label: {
                 Image(systemName: "gearshape")
             }

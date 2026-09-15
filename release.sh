@@ -9,17 +9,25 @@
 #   2. Store notarization credentials once (use an app-specific password):
 #        xcrun notarytool store-credentials nethog-notary \
 #          --apple-id you@example.com --team-id TEAMID1234
-#   3. Run:
+#   3. Bump CFBundleShortVersionString and CFBundleVersion in Resources/Info.plist.
+#      Sparkle only offers an update when CFBundleVersion goes up.
+#   4. Run:
 #        SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID1234)" \
 #        NOTARY_PROFILE=nethog-notary ./release.sh
+#   5. Publish the DMG and appcast.xml together as a GitHub release (printed at the end).
+#
+# Updates are signed with the Sparkle key in your login keychain (account "NetHog").
+# Back it up: .build/artifacts/sparkle/Sparkle/bin/generate_keys --account NetHog -x sparkle-key.txt
 set -euo pipefail
 cd "$(dirname "$0")"
 
+REPO="ABDe3N/NetHog"
 IDENTITY="${SIGN_IDENTITY:--}"
 PROFILE="${NOTARY_PROFILE:-}"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Resources/Info.plist)"
 APP="build/NetHog.app"
 DMG="build/NetHog-$VERSION.dmg"
+SPARKLE_BIN=".build/artifacts/sparkle/Sparkle/bin"
 
 notarize() {
     xcrun notarytool submit "$1" --keychain-profile "$PROFILE" --wait
@@ -56,5 +64,15 @@ fi
 notarize "$DMG"
 xcrun stapler staple "$DMG"
 spctl --assess --type open --context context:primary-signature -v "$DMG"
+
+# Sparkle feed listing just this release; installed copies read it from the latest GitHub release.
+FEED_DIR="build/appcast"
+rm -rf "$FEED_DIR"
+mkdir -p "$FEED_DIR"
+cp "$DMG" "$FEED_DIR/"
+"$SPARKLE_BIN/generate_appcast" --account NetHog \
+    --download-url-prefix "https://github.com/$REPO/releases/download/v$VERSION/" "$FEED_DIR"
+
 shasum -a 256 "$DMG"
-echo "Built $DMG (signed, notarized, stapled)"
+echo "Built $DMG (signed, notarized, stapled) and $FEED_DIR/appcast.xml"
+echo "Publish with: gh release create v$VERSION $DMG $FEED_DIR/appcast.xml --title \"NetHog $VERSION\""

@@ -3,6 +3,22 @@
 A tiny macOS menu bar app that shows which apps are using your network right now,
 with live download and upload speeds for each one.
 
+## Install
+
+Download the latest `NetHog-<version>.dmg` from
+[Releases](https://github.com/ABDe3N/NetHog/releases), open it, and drag NetHog into
+Applications. Open it from Applications, not from the disk image, or Launch at login
+and updates won't work (NetHog will remind you).
+
+NetHog checks for updates with [Sparkle](https://sparkle-project.org). You can also
+check by hand from the gear menu.
+
+## Privacy
+
+NetHog never sends anything anywhere. It has no analytics, no account, and needs no
+admin password or special permissions. The only network request it makes is the update
+check against this repository's releases.
+
 ## Build and run
 
 ```bash
@@ -13,6 +29,8 @@ with live download and upload speeds for each one.
 To make a universal `build/NetHog-<version>.dmg`, run `./release.sh`. Set
 `SIGN_IDENTITY` and `NOTARY_PROFILE` to sign and notarize it for public download
 (see the top of `release.sh`).
+
+Run the tests with `swift test`.
 
 Requires macOS 13+ and the Xcode command line tools. Regenerate the icon with
 `swift Scripts/make_icon.swift`.
@@ -26,6 +44,11 @@ Loopback (localhost) traffic is excluded.
 Helper processes are merged into their app (Chrome Helper → Google Chrome), and XPC
 services are attributed to the app that launched them (WebKit networking → Safari).
 Turn off "Group" to see individual processes.
+
+The XPC attribution uses `responsibility_get_pid_responsible_for_pid`, a private macOS
+function that Activity Monitor also relies on. It is looked up at runtime, so if a future
+macOS removes it, those services just show under their own names. (Private API use is
+also why NetHog can't be on the Mac App Store.)
 
 - **Live**: what's transferring now (idle apps fade out after 5 seconds).
 - **Since Launch**: total data per app since NetHog started.
@@ -44,3 +67,7 @@ Turn off "Group" to see individual processes.
 build/NetHog.app/Contents/MacOS/NetHog --dump [--no-group]   # print current hogs to the terminal
 build/NetHog.app/Contents/MacOS/NetHog --snapshot ui.png     # render the popover to an image
 ```
+
+## License
+
+MIT. See [LICENSE](LICENSE).

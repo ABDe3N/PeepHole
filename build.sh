@@ -5,29 +5,42 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-ARCH_FLAGS=()
+# --disable-keychain: dependencies are public, so never prompt for GitHub credentials.
+SWIFT_FLAGS=(-c release --disable-keychain)
 if [ "${UNIVERSAL:-0}" = "1" ]; then
-    ARCH_FLAGS=(--arch arm64 --arch x86_64)
+    SWIFT_FLAGS+=(--arch arm64 --arch x86_64)
 fi
 
-swift build -c release ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"}
-BIN="$(swift build -c release ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"} --show-bin-path)/NetHog"
+swift build "${SWIFT_FLAGS[@]}"
+BIN_DIR="$(swift build "${SWIFT_FLAGS[@]}" --show-bin-path)"
 
 APP="build/NetHog.app"
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN" "$APP/Contents/MacOS/NetHog"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
+cp "$BIN_DIR/NetHog" "$APP/Contents/MacOS/NetHog"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 if [ -f Resources/AppIcon.icns ]; then
     cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 fi
+# ditto keeps the framework's internal symlinks intact.
+ditto "$BIN_DIR/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"
 
 IDENTITY="${SIGN_IDENTITY:--}"
 if [ "$IDENTITY" = "-" ]; then
+    codesign --force --sign - "$APP/Contents/Frameworks/Sparkle.framework"
     codesign --force --sign - "$APP" >/dev/null
 else
-    codesign --force --options runtime --timestamp --sign "$IDENTITY" "$APP"
+    # Sign inside-out, as Sparkle's docs require for non-sandboxed apps.
+    SPARKLE="$APP/Contents/Frameworks/Sparkle.framework"
+    sign() { codesign --force --options runtime --timestamp --sign "$IDENTITY" "$@"; }
+    sign "$SPARKLE/Versions/B/XPCServices/Installer.xpc"
+    sign --preserve-metadata=entitlements "$SPARKLE/Versions/B/XPCServices/Downloader.xpc"
+    sign "$SPARKLE/Versions/B/Autoupdate"
+    sign "$SPARKLE/Versions/B/Updater.app"
+    sign "$SPARKLE"
+    sign "$APP"
 fi
+codesign --verify --deep --strict "$APP"
 echo "Built $APP ($(lipo -archs "$APP/Contents/MacOS/NetHog"))"
 
 if [ "${1:-}" = "install" ]; then

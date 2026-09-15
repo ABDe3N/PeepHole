@@ -81,9 +81,10 @@ final class NetworkMonitor: ObservableObject {
     private var historyCounter = 0
     private var task: Task<Void, Never>?
 
-    init() {
+    /// Pass `sampling: false` to feed samples by hand through `ingest` (tests).
+    init(sampling: Bool = true) {
         history = (0..<Self.historyLength).map { ThroughputPoint(id: $0 - Self.historyLength, down: 0, up: 0) }
-        start()
+        if sampling { start() }
     }
 
     func start() {
@@ -91,8 +92,9 @@ final class NetworkMonitor: ObservableObject {
         task = Task { [weak self] in
             while !Task.isCancelled {
                 let started = Date()
-                let samples = await Task.detached(priority: .utility) { NettopReader.sample() }.value
-                self?.ingest(samples, at: Date())
+                if let samples = await Task.detached(priority: .utility, operation: { NettopReader.sample() }).value {
+                    self?.ingest(samples, at: Date())
+                }
                 // Keep a steady ~1 second cadence regardless of how long nettop took.
                 let remaining = max(0.2, 1.0 - Date().timeIntervalSince(started))
                 try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
@@ -100,7 +102,7 @@ final class NetworkMonitor: ObservableObject {
         }
     }
 
-    private func ingest(_ samples: [ProcessSample], at now: Date) {
+    func ingest(_ samples: [ProcessSample], at now: Date) {
         let elapsed = lastSampleTime.map { now.timeIntervalSince($0) } ?? 0
         lastSampleTime = now
 

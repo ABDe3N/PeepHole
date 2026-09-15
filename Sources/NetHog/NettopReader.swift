@@ -11,7 +11,12 @@ struct ProcessSample {
 /// Reads per-process network counters using the built-in `/usr/bin/nettop`.
 /// nettop needs no root privileges and sees every process on the system.
 enum NettopReader {
-    static func sample() -> [ProcessSample] {
+    /// nettop normally returns in a few milliseconds; anything past this is a hang.
+    static let timeout: TimeInterval = 5
+
+    /// Returns nil if nettop could not run or had to be killed, so the caller can
+    /// skip the tick instead of mistaking it for "every process exited".
+    static func sample() -> [ProcessSample]? {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/nettop")
         // -P: one summary line per process, -L 1: a single CSV sample,
@@ -23,10 +28,16 @@ enum NettopReader {
         do {
             try process.run()
         } catch {
-            return []
+            return nil
         }
+        // Without this, a stuck nettop would block the read forever and freeze the numbers.
+        let pid = process.processIdentifier
+        let watchdog = DispatchWorkItem { if process.isRunning { kill(pid, SIGKILL) } }
+        DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + timeout, execute: watchdog)
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
+        watchdog.cancel()
+        guard process.terminationReason == .exit, process.terminationStatus == 0 else { return nil }
         return parse(String(decoding: data, as: UTF8.self))
     }
 

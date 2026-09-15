@@ -27,6 +27,10 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2026 ibnabdeen</string>
+	<string>© 2026 Amr Abdeen</string>
+	<key>SUFeedURL</key>
+	<string>https://github.com/ABDe3N/NetHog/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>cjZHJE4i7NaC6irOMGH3NImP02cN6xNZXykoNREP0YI=</string>
 </dict>
 </plist>

@@ -49,7 +49,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if AppLocation.isTemporary, !AppLocation.confirmRunningFromTemporaryLocation() {
+            NSApp.terminate(nil)
+            return
+        }
         Activity.discardStaleThreshold()
+        Updates.shared.start()
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.button?.target = self
         statusItem.button?.action = #selector(togglePopover)
